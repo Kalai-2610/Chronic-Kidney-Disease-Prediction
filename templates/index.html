@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}"">
+    <title>Chronic Kidney Disease Predictor</title>
+    <script>
+        function Predict()
+        {
+            document.getElementById('positive').hidden = true;
+            document.getElementById('negative').hidden = true;
+            var specific_gravity = document.forms["ipdata"]["specific_gravity"].value;
+            var albumin = document.forms["ipdata"]["albumin"].value;
+            var blood_glucose_random = document.forms["ipdata"]["blood_glucose_random"].value;
+            var blood_urea = document.forms["ipdata"]["blood_urea"].value;
+            var serum_creatinine = document.forms["ipdata"]["serum_creatinine"].value;
+            var haemoglobin = document.forms["ipdata"]["haemoglobin"].value;
+            var packed_cell_volume = document.forms["ipdata"]["packed_cell_volume"].value;
+            var white_blood_cell_count = document.forms["ipdata"]["white_blood_cell_count"].value;
+            var hypertension = document.forms["ipdata"]["hypertension"].value;
+            var diabetes_mellitus = document.forms["ipdata"]["diabetes_mellitus"].value;
+            document.getElementById('reset').click();
+
+            var url = 'http://127.0.0.1:5000/predict?specific_gravity=' + specific_gravity + '&albumin=' + albumin + '&blood_glucose_random=' + blood_glucose_random + '&blood_urea=' + blood_urea + '&serum_creatinine=' + serum_creatinine + '&haemoglobin=' + haemoglobin + '&packed_cell_volume=' + packed_cell_volume + '&white_blood_cell_count=' + white_blood_cell_count + '&hypertension=' + hypertension + '&diabetes_mellitus=' + diabetes_mellitus
+            
+            fetch(url)
+            .then( response => response.json() )
+            .then( data => {
+                console.log(data.result);
+                if(parseInt(data.result)>50)
+                {
+                    document.getElementById('neg_data').innerHTML = "Probability of Chronic Kidney Disease is "+ data.result +"%<br/>\"There is a Possiblity that you are having Chronic Kidney Disease.\"";
+                    document.getElementById('negative').hidden = false;
+                }
+                else
+                {
+                    document.getElementById('pos_data').innerHTML = "Probability of Chronic Kidney Disease is "+ data.result +"%<br/>\"There is a Very Less Possiblity that you are have Chronic Kidney Disease. Stay Healthy\"";
+                    document.getElementById('positive').hidden = false;
+                }
+                
+            })
+            .catch( error => console.log(error) )
+        }
+    </script>
+</head>
+<body>
+    <h2 id="h">Chronic Kidney Disease Prediction</h2>
+    <div id="positive" hidden><h4 id="pos_data">Positive</h4></div>
+    <div id="negative" hidden><h4 id="neg_data">Negative</h4></div>
+    <table>
+        <form name="ipdata" onsubmit="event.preventDefault(); Predict();" on action="/" method="get">
+        <tr>
+            <td>Specific Gravity</td>
+            <td><input name="specific_gravity" type="number" min="1.005" step="0.005" max="1.025" placeholder="1.015 - 1.025 " required></td>
+        </tr>
+        <tr>
+            <td>Albumin</td>
+            <td><input name="albumin" type="number" min="0" step="1" max="5" placeholder="0 - 5" required></td>
+        </tr>
+        <tr>
+            <td>Blood Glucose Random</td>
+            <td><input name="blood_glucose_random" type="number" min="70" step="1" max="500" placeholder="90 - 140 mgs/dl" required></td>
+        </tr>
+        <tr>
+            <td>Blood Urea</td>
+            <td><input name="blood_urea" type="number" min="5" step="0.1" max="400" placeholder="6 - 24 mgs/dl" required></td>
+        </tr>
+        <tr>
+            <td>Serum Creatinine</td>
+            <td><input name="serum_creatinine" type="number" min="0" step="0.1" max="50" placeholder="0.6 - 1.2 mg/dl" required></td>
+        </tr>
+        <tr>
+            <td>Hemoglobin</td>
+            <td><input name="haemoglobin" type="number" min="5" step="0.1" max="18" placeholder="12 - 16 gms" required></td>
+        </tr>
+        <tr>
+            <td>Packed Cell Volume</td>
+            <td><input name="packed_cell_volume" type="number" min="15" step="1" max="55" placeholder="37 - 47 %" required></td>
+        </tr>
+        <tr>
+            <td>White Blood Cell Count</td>
+            <td><input name="white_blood_cell_count" type="number" min="2000" step="1" max="26500" placeholder="4500 - 10500 U/cmm" required></td>
+        </tr>
+        <tr>
+            <td>Hypertension</td>
+            <td><input id="radio" name="hypertension" type="radio" value="0" required>&nbsp;Yes&emsp;<input id="radio" name="hypertension" type="radio" value="1" required>&nbsp;No</td>
+        </tr>
+        <tr>
+            <td>Diabetes Mellitus</td>
+            <td><input id="radio" name="diabetes_mellitus" type="radio" value="0" required>&nbsp;Yes&emsp;<input id="radio" name="diabetes_mellitus" type="radio" value="1" required>&nbsp;No</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td id="btn"><div id="btndiv"><input id="submit" type="submit" value="Predict"></div>&emsp;<div id="btndiv"><input id="reset" type="reset" value="Clear"></div></td>
+        </tr>
+        </form>
+    </table>
+</body>
+</html>
